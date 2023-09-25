@@ -3,11 +3,14 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BookingManagementApp.Models
 {
+    //membuat anotasi tabel dengan nama custom
     [Table("tb_m_university")]
     public class University : BaseEntity
     {
+        //tidak boleh null, menamai kolom dan tipe data spesifik
         [Required, Column("code", TypeName = "nvarchar(50)")]
         public string Code { get; set; }
+        //tidak boleh null, menamai kolom dan tipe data spesifik
         [Required, Column("name", TypeName = "nvarchar(100)")]
         public string Name { get; set; }
     }
