@@ -16,5 +16,6 @@ namespace BookingManagementApp.Models
         //tidak boleh null dan menamai kolom 
         [Required, Column("capacity")]
         public int Capacity { get; set; }
+        public ICollection<Booking>? Bookings { get; set; }
     }
 }

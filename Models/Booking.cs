@@ -16,13 +16,14 @@ namespace BookingManagementApp.Models
         public StatusLevel Status { get; set; }
         //tidak boleh null, menamai kolom dan tipe data spesifik
         [Required, Column("remarks", TypeName = "nvarchar")]
-        public string Remarks { get; set; }
+        public string Remarks { get; set; } 
         //tidak boleh null dan menamai kolom 
-        [ForeignKey("Room"), Column("room_guid")]
-        public Guid RoomGuid { get; set; }
-        //tidak boleh null dan menamai kolom 
-        [ForeignKey("Employee"), Column("employee_id")]
+        [Required, Column("employee_guid")]
         public Guid EmployeeGuid { get; set; }
-
+        //tidak boleh null dan menamai kolom 
+        [Required, Column("room_guid")]
+        public Guid RoomGuid { get; set; }
+        public Employee? Employee { get; set; }
+        public Room? Room { get; set; }
     }
 }

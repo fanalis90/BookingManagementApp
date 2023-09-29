@@ -17,8 +17,10 @@ namespace BookingManagementApp.Models
         [Required, Column("is_used")]
         public bool IsUsed { get; set; }
         //tidak boleh null dan menamai kolom 
-        [Required,Column("expired_time")]
+        [Required, Column("expired_time")]
         public DateTime ExpiredTime { get; set; }
+        public Employee? Employee { get; set; }
+        public ICollection<AccountRole>? AccountRoles { get; set; }
 
     }
 }

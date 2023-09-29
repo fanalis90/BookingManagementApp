@@ -32,6 +32,9 @@ namespace BookingManagementApp.Models
         public string Email { get; set; }
         //tidak boleh null, menamai kolom dan tipe data spesifik
         [Required, Column("phone_number", TypeName = "nvarchar(20)")]
-        public string phoneNumber { get; set; }
+        public string PhoneNumber { get; set; }
+        public Education? Education {  get; set; }
+        public Account? Account {  get; set; }
+        public ICollection<Booking>? Bookings { get; set; }
     }
 }

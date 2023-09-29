@@ -17,8 +17,11 @@ namespace BookingManagementApp.Models
         [Required, Column("gpa")]
         public float GPA { get; set; }
         //tidak boleh null, menamai kolom dan tipe data spesifik
-        [ForeignKey("University"), Column("university_guid")]
+        [Required, Column("university_guid")]
         public Guid UniversityGuid { get; set; }
+
+        public University? University { get; set; }
+        public Employee? Employee {  get; set; }
 
     }
 }

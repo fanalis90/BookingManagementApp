@@ -13,5 +13,6 @@ namespace BookingManagementApp.Models
         //tidak boleh null, menamai kolom dan tipe data spesifik
         [Required, Column("name", TypeName = "nvarchar(100)")]
         public string Name { get; set; }
+        public ICollection<Education>? Educations { get; set; }
     }
 }
