@@ -66,11 +66,12 @@ namespace BookingManagementApp.Controllers
         }
         //method delete dari http untuk delete university
         [HttpDelete]
-        public IActionResult Delete(University university) {
+        public IActionResult Delete(Guid guid) {
+            var university = _universityRepository.GetByGuid(guid);
             var result = _universityRepository.Delete(university);
             if (!result)
             {
-                return BadRequest("Failed To Update Data");
+                return BadRequest("Failed To Delete Data");
             }
 
             return Ok(result);
