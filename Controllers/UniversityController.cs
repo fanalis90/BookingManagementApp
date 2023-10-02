@@ -1,4 +1,5 @@
-﻿using BookingManagementApp.Contracts;
+﻿using API.DTOs.Universities;
+using BookingManagementApp.Contracts;
 using BookingManagementApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,8 +26,13 @@ namespace BookingManagementApp.Controllers
             {
                 return NotFound("Data Not Found");
             }
-
-            return Ok(result);
+            var data = result.Select(u => (UniversityDto) u);
+            /*var universityDto = new List<UniversityDto>();
+               foreach (var university in result)
+               {
+                   universityDto.Add((UniversityDto) university);
+               }*/
+            return Ok(data);
         }
         //method get dari http untuk getByGuid university
         [HttpGet("{guid}")]
@@ -38,25 +44,34 @@ namespace BookingManagementApp.Controllers
                 return NotFound("Data Not Found");
 
             }
-            return Ok(result);
+            return Ok((UniversityDto) result);
         }
         //method post dari http untuk create university
         [HttpPost]
-        public IActionResult Create(University university)
+        public IActionResult Create(CreateUniversityDto createUniversityDto)
         {
-            var result = _universityRepository.Create(university);
+            var result = _universityRepository.Create(createUniversityDto);
             if( result  is null)
             {
                 return BadRequest("Failed To Create Data");
             }
-            return Ok(result);
+            return Ok((UniversityDto) result);
         }
 
         //method put dari http untuk Update university
         [HttpPut]
-        public IActionResult Update(University university)
+        public IActionResult Update(UniversityDto universityDto)
         {
-            var result = _universityRepository.Update(university);
+            var entity = _universityRepository.GetByGuid(universityDto.Guid);
+            if (entity is null)
+            {
+                return NotFound("Data Not Found");
+
+            }
+            University toUpdate = universityDto;
+            toUpdate.CreatedDate = entity.CreatedDate;
+
+            var result = _universityRepository.Update(toUpdate);
             if (!result)
             {
                 return BadRequest("Failed To Update Data");
@@ -65,9 +80,14 @@ namespace BookingManagementApp.Controllers
             return Ok(result);
         }
         //method delete dari http untuk delete university
-        [HttpDelete]
+        [HttpDelete("{guid}")]
         public IActionResult Delete(Guid guid) {
             var university = _universityRepository.GetByGuid(guid);
+            if (university is null)
+            {
+                return NotFound("Data Not Found");
+
+            }
             var result = _universityRepository.Delete(university);
             if (!result)
             {

@@ -1,4 +1,5 @@
-﻿using BookingManagementApp.Contracts;
+﻿using API.DTOs.AccountRoles;
+using BookingManagementApp.Contracts;
 using BookingManagementApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,8 +26,9 @@ namespace BookingManagementApp.Controllers
             {
                 return NotFound("Data Not Found");
             }
+            var data = result.Select(i => (AccountRoleDto) i);
 
-            return Ok(result);
+            return Ok(data);
         }
         //method get dari http untuk getByGuid accountRole
         [HttpGet("{guid}")]
@@ -38,25 +40,25 @@ namespace BookingManagementApp.Controllers
                 return NotFound("Data Not Found");
 
             }
-            return Ok(result);
+            return Ok((AccountRoleDto) result);
         }
         //method post dari http untuk create accountRole
         [HttpPost]
-        public IActionResult Create(AccountRole accountRole)
+        public IActionResult Create(AccountRoleDto accountRoleDto)
         {
-            var result = _accountRoleRepository.Create(accountRole);
+            var result = _accountRoleRepository.Create(accountRoleDto);
             if (result is null)
             {
                 return BadRequest("Failed To Create Data");
             }
-            return Ok(result);
+            return Ok((AccountRoleDto) result);
         }
 
         //method put dari http untuk Update accountRole
         [HttpPut]
-        public IActionResult Update(AccountRole accountRole)
+        public IActionResult Update(AccountRoleDto accountRoleDto)
         {
-            var result = _accountRoleRepository.Update(accountRole);
+            var result = _accountRoleRepository.Update(accountRoleDto);
             if (!result)
             {
                 return BadRequest("Failed To Update Data");
