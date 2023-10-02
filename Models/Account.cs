@@ -8,7 +8,7 @@ namespace BookingManagementApp.Models
     public class Account : BaseEntity
     {
         //tidak boleh null, menamai kolom dan tipe data spesifik
-        [Required, Column("password", TypeName = "nvarchar")]
+        [Required, Column("password", TypeName = "nvarchar(max)")]
         public string Password { get; set; }
         //tidak boleh null dan menamai kolom 
         [Required, Column("otp")]

@@ -15,7 +15,7 @@ namespace BookingManagementApp.Models
         [Required, Column("status")]
         public StatusLevel Status { get; set; }
         //tidak boleh null, menamai kolom dan tipe data spesifik
-        [Required, Column("remarks", TypeName = "nvarchar")]
+        [Required, Column("remarks", TypeName = "nvarchar(max)")]
         public string Remarks { get; set; } 
         //tidak boleh null dan menamai kolom 
         [Required, Column("employee_guid")]

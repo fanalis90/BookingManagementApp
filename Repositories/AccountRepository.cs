@@ -6,11 +6,13 @@ namespace BookingManagementApp.Repositories
 {
     public class AccountRepository : IAccountRepository
     {
+        //membuat context dari booking management dbcontext
         private readonly BookingManagementDbContext _context;
-
+        //melakukan dependency injection
         public AccountRepository(BookingManagementDbContext context) {
             _context = context;
         }
+        //implementasi interface method create
         public Account? Create(Account account)
         {
             try
@@ -23,7 +25,7 @@ namespace BookingManagementApp.Repositories
                 return null;
             }
         }
-
+        //implementasi interface method delete
         public bool Delete(Account account)
         {
             try
@@ -37,17 +39,17 @@ namespace BookingManagementApp.Repositories
                 return false;
             }
         }
-
+        //implementasi interface method getall
         public IEnumerable<Account> GetAll()
         {
             return _context.Set<Account>().ToList();
         }
-
+        //implementasi interface method getbyguid
         public Account? GetByGuid(Guid guid)
         {
             return _context.Set<Account>().Find(guid);
         }
-
+        //implementasi interface method update
         public bool Update(Account account)
         {
             try
