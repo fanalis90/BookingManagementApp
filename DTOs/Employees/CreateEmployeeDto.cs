@@ -5,7 +5,6 @@ namespace API.DTOs.Employees
 {
     public class CreateEmployeeDto
     {
-        public Guid Guid { get; set; }
         public string Nik { get; set; }
         public string FirstName { get; set; }
         public string? LastName { get; set; }
@@ -21,7 +20,6 @@ namespace API.DTOs.Employees
         {
             return new Employee
             {
-                Guid = employeeDto.Guid,
                 NIK = employeeDto.Nik,
                 FirstName = employeeDto.FirstName,
                 LastName = employeeDto.LastName,

@@ -4,6 +4,7 @@ namespace API.DTOs.Accounts
 {
     public class CreateAccountDto
     {
+        public Guid Guid { get; set; }
         public int Otp { get; set; }
         public bool IsUsed { get; set; }
         public string Password { get; set; }
@@ -15,6 +16,7 @@ namespace API.DTOs.Accounts
         {
             return new Account
             {
+                Guid = createAccountDto.Guid,
                 OTP = createAccountDto.Otp,
                 IsUsed = createAccountDto.IsUsed,
                 Password = createAccountDto.Password,

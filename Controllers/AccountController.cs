@@ -1,4 +1,6 @@
 ﻿using API.DTOs.AccountRoles;
+using API.DTOs.Accounts;
+using API.Utilities.Handler;
 using BookingManagementApp.Contracts;
 using BookingManagementApp.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -26,8 +28,8 @@ namespace BookingManagementApp.Controllers
             {
                 return NotFound("Data Not Found");
             }
-            
-            return Ok( result);
+            var data = result.Select(i => (AccountDto) i);
+            return Ok(data);
         }
         //method get dari http untuk getByGuid account
         [HttpGet("{guid}")]
@@ -39,23 +41,27 @@ namespace BookingManagementApp.Controllers
                 return NotFound("Data Not Found");
 
             }
-            return Ok(result);
+            return Ok((AccountDto) result);
         }
         //method post dari http untuk create account
         [HttpPost]
-        public IActionResult Create(Account account)
+        public IActionResult Create(CreateAccountDto account)
         {
-            var result = _accountRepository.Create(account);
+            Account toCreate = account;
+            toCreate.Password = HashHandler.HashPassword(account.Password);
+            
+            var result = _accountRepository.Create(toCreate);
+            
             if (result is null)
             {
                 return BadRequest("Failed To Create Data");
             }
-            return Ok(result);
+            return Ok((AccountDto) result);
         }
 
         //method put dari http untuk Update account
         [HttpPut]
-        public IActionResult Update(Account account)
+        public IActionResult Update(AccountDto account)
         {
             var result = _accountRepository.Update(account);
             if (!result)
@@ -66,7 +72,7 @@ namespace BookingManagementApp.Controllers
             return Ok(result);
         }
         //method delete dari http untuk delete account
-        [HttpDelete]
+        [HttpDelete("{guid}")]
         public IActionResult Delete(Guid guid)
         {
             var account = _accountRepository.GetByGuid(guid);

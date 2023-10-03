@@ -1,4 +1,5 @@
-﻿using BookingManagementApp.Contracts;
+﻿using API.DTOs.Bookings;
+using BookingManagementApp.Contracts;
 using BookingManagementApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,8 +26,9 @@ namespace BookingManagementApp.Controllers
             {
                 return NotFound("Data Not Found");
             }
+            var data = result.Select(i => (BookingDto)i);
 
-            return Ok(result);
+            return Ok(data);
         }
         //method get dari http untuk getByGuid booking
         [HttpGet("{guid}")]
@@ -38,23 +40,23 @@ namespace BookingManagementApp.Controllers
                 return NotFound("Data Not Found");
 
             }
-            return Ok(result);
+            return Ok((BookingDto) result);
         }
         //method post dari http untuk create booking
         [HttpPost]
-        public IActionResult Create(Booking booking)
+        public IActionResult Create(CreateBookingDto booking)
         {
             var result = _bookingRepository.Create(booking);
             if (result is null)
             {
                 return BadRequest("Failed To Create Data");
             }
-            return Ok(result);
+            return Ok((BookingDto) result);
         }
 
         //method put dari http untuk Update booking
         [HttpPut]
-        public IActionResult Update(Booking booking)
+        public IActionResult Update(BookingDto booking)
         {
             var result = _bookingRepository.Update(booking);
             if (!result)
@@ -65,7 +67,7 @@ namespace BookingManagementApp.Controllers
             return Ok(result);
         }
         //method delete dari http untuk delete booking
-        [HttpDelete]
+        [HttpDelete("{guid}")]
         public IActionResult Delete(Guid guid)
         {
             var booking = _bookingRepository.GetByGuid(guid);

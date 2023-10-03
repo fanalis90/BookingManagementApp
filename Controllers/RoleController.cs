@@ -65,7 +65,7 @@ namespace BookingManagementApp.Controllers
             return Ok(result);
         }
         //method delete dari http untuk delete role
-        [HttpDelete]
+        [HttpDelete("{guid}")]
         public IActionResult Delete(Guid guid)
         {
             var role = _roleRepository.GetByGuid(guid);

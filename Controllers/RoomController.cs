@@ -65,7 +65,7 @@ namespace BookingManagementApp.Controllers
             return Ok(result);
         }
         //method delete dari http untuk delete room
-        [HttpDelete]
+        [HttpDelete("{guid}")]
         public IActionResult Delete(Guid guid)
         {
             var room = _roomRepository.GetByGuid(guid);
