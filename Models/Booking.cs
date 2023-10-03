@@ -10,8 +10,14 @@ namespace BookingManagementApp.Models
     {
         //tidak boleh null dan menamai kolom 
         [Required, Column("start_date")]
-        public DateTime StartDate { get; set; }
         //tidak boleh null dan menamai kolom 
+        public DateTime StartDate { get; set; }
+       
+        //tidak boleh null dan menamai kolom 
+        [Required, Column("end_date")]
+        public DateTime EndDate { get; set; }
+        //tidak boleh null dan menamai kolom 
+       
         [Required, Column("status")]
         public StatusLevel Status { get; set; }
         //tidak boleh null, menamai kolom dan tipe data spesifik

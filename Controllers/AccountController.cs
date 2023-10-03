@@ -1,4 +1,5 @@
-﻿using BookingManagementApp.Contracts;
+﻿using API.DTOs.AccountRoles;
+using BookingManagementApp.Contracts;
 using BookingManagementApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
@@ -25,8 +26,8 @@ namespace BookingManagementApp.Controllers
             {
                 return NotFound("Data Not Found");
             }
-
-            return Ok(result);
+            
+            return Ok( result);
         }
         //method get dari http untuk getByGuid account
         [HttpGet("{guid}")]

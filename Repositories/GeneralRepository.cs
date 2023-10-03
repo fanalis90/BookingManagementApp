@@ -3,6 +3,7 @@ using BookingManagementApp.Data;
 
 namespace API.Repositories
 {
+    //membuat class generalrepository menggunakan generic 
     public class GeneralRepository<TEntity> : IGeneralRepository<TEntity> where TEntity : class
     {
         private readonly BookingManagementDbContext _context;
@@ -10,7 +11,7 @@ namespace API.Repositories
         {
             _context = context;
         }
-
+        //methood create 
         public TEntity? Create(TEntity entity)
         {
             try
@@ -26,7 +27,7 @@ namespace API.Repositories
 
 
         }
-
+        //method delete
         public bool Delete(TEntity entity)
         {
             try
@@ -39,17 +40,17 @@ namespace API.Repositories
                 return false;
             }
         }
-
+        //method getall
         public IEnumerable<TEntity> GetAll()
         {
            return _context.Set<TEntity>().ToList();
         }
-
+        //method getbyguid
         public TEntity? GetByGuid(Guid guid)
         {
             return _context.Set<TEntity>().Find(guid);
         }
-
+        //method update
         public bool Update(TEntity entity)
         {
             try

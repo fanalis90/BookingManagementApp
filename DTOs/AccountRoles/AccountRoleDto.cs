@@ -7,12 +7,15 @@ namespace API.DTOs.AccountRoles
         public Guid AccountGuid { get; set; }
         public Guid RoleGuid { get; set; }
 
+
+        //membuat explicit operator untuk response get, create , getbyid
         public static explicit operator AccountRoleDto(AccountRole accountRole) {
             return new AccountRoleDto { 
                 AccountGuid = accountRole.AccountGuid, 
                 RoleGuid = accountRole.RoleGuid };
         }
-        
+
+        //membuat implicit operator untuk update
         public static implicit operator AccountRole(AccountRoleDto accountRoleDto)
         {
             return new AccountRole
