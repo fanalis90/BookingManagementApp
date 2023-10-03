@@ -1,11 +1,12 @@
-﻿using API.DTOs.AccountRoles;
-using API.DTOs.Accounts;
-using API.Utilities.Handler;
-using BookingManagementApp.Contracts;
-using BookingManagementApp.Models;
+﻿using API.DTOs.Accounts;
+using API.Utilities.Handlers;
+using API.Contracts;
+using API.Models;
 using Microsoft.AspNetCore.Mvc;
+using API.Utilities.Handlers.Exceptions;
+using API.DTOs.AccountRoles;
 
-namespace BookingManagementApp.Controllers
+namespace API.Controllers
 {
     //membuat endpoint routing untuk account controller 
     [ApiController]
@@ -26,10 +27,10 @@ namespace BookingManagementApp.Controllers
             var result = _accountRepository.GetAll();
             if (!result.Any())
             {
-                return NotFound("Data Not Found");
+                return NotFound(new ResponseNotFoundHandler("Data Not Found"));
             }
             var data = result.Select(i => (AccountDto) i);
-            return Ok(data);
+            return Ok(new ResponseOkHandler<IEnumerable<AccountDto>>(data));
         }
         //method get dari http untuk getByGuid account
         [HttpGet("{guid}")]
@@ -38,51 +39,74 @@ namespace BookingManagementApp.Controllers
             var result = _accountRepository.GetByGuid(guid);
             if (result is null)
             {
-                return NotFound("Data Not Found");
+                return NotFound(new ResponseNotFoundHandler("Data Not Found"));
 
             }
-            return Ok((AccountDto) result);
+            return Ok(new ResponseOkHandler<AccountDto>((AccountDto)result));
         }
         //method post dari http untuk create account
         [HttpPost]
-        public IActionResult Create(CreateAccountDto account)
+        public IActionResult Create(CreateAccountDto createAccountDto)
         {
-            Account toCreate = account;
-            toCreate.Password = HashHandler.HashPassword(account.Password);
-            
-            var result = _accountRepository.Create(toCreate);
-            
-            if (result is null)
+            try
             {
-                return BadRequest("Failed To Create Data");
+                Account toCreate = createAccountDto;
+                toCreate.Password = HashHandler.HashPassword(createAccountDto.Password);
+            
+                var result = _accountRepository.Create(toCreate);
+                return Ok(new ResponseOkHandler<AccountDto>((AccountDto)result));
+
             }
-            return Ok((AccountDto) result);
+            
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseInternalServerErrorHandler("Failed to Create Data", e.Message));
+            }
         }
 
         //method put dari http untuk Update account
         [HttpPut]
-        public IActionResult Update(AccountDto account)
+        public IActionResult Update(AccountDto accountDto)
         {
-            var result = _accountRepository.Update(account);
-            if (!result)
+            try
             {
-                return BadRequest("Failed To Update Data");
+                var entity = _accountRepository.GetByGuid(accountDto.Guid);
+                if (entity is null)
+                {
+                    return NotFound(new ResponseNotFoundHandler("Data Not Found"));
+
+                }
+                Account toUpdate = accountDto;
+                toUpdate.CreatedDate = entity.CreatedDate;
+                var result = _accountRepository.Update(toUpdate);
+                return Ok(new ResponseOkHandler<String>("Data Updated"));
+
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseInternalServerErrorHandler("Failed to Create Data", e.Message));
             }
 
-            return Ok(result);
         }
         //method delete dari http untuk delete account
         [HttpDelete("{guid}")]
         public IActionResult Delete(Guid guid)
         {
-            var account = _accountRepository.GetByGuid(guid);
-            var result = _accountRepository.Delete(account);
-            if (!result)
+            try
             {
-                return BadRequest("Failed To Delete Data");
-            }
+                var account = _accountRepository.GetByGuid(guid);
+                if (account is null)
+                {
+                    return NotFound(new ResponseNotFoundHandler("Data Not Found"));
 
-            return Ok(result);
+                }
+                var result = _accountRepository.Delete(account);
+
+                return Ok(new ResponseOkHandler<String>("Data Deleted"));
+            } catch ( Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseInternalServerErrorHandler("Failed to Create Data", e.Message));
+            }
         }
     }
 }

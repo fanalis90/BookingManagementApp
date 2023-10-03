@@ -1,4 +1,4 @@
-﻿using BookingManagementApp.Models;
+﻿using API.Models;
 
 namespace API.DTOs.Educations
 {
@@ -15,6 +15,7 @@ namespace API.DTOs.Educations
         {
             return new Education
             {
+                Guid = new Guid(),
                 Major = createEducationDto.Major,
                 Degree = createEducationDto.Degree,
                 GPA = createEducationDto.Gpa,

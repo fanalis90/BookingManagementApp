@@ -1,10 +1,12 @@
-﻿using BookingManagementApp.Models;
-using BookingManagementApp.Utilities.Enum;
+﻿
+using API.Models;
+using API.Utilities.Enum;
 
 namespace API.DTOs.Bookings
 {
     public class BookingDto
     {
+        public Guid Guid { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime EndDate { get; set; }
         public StatusLevel Status { get; set; }
@@ -32,6 +34,7 @@ namespace API.DTOs.Bookings
         {
             return new BookingDto
             {
+                Guid = booking.Guid,
                 StartDate = booking.StartDate,
                 EndDate = booking.EndDate,
                 Status = booking.Status,

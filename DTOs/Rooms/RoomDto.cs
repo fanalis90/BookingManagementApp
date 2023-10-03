@@ -1,5 +1,5 @@
 ﻿using API.DTOs.Roles;
-using BookingManagementApp.Models;
+using API.Models;
 
 namespace API.DTOs.Rooms
 {

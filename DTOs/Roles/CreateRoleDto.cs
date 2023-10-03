@@ -1,6 +1,6 @@
-﻿using API.DTOs.Employees;
-using BookingManagementApp.Models;
-using BookingManagementApp.Utilities.Enum;
+﻿
+
+using API.Models;
 
 namespace API.DTOs.Roles
 {
@@ -14,6 +14,7 @@ namespace API.DTOs.Roles
         {
             return new Role
             {
+                Guid = new Guid(),
                 Name = roleDto.Name,
                 CreatedDate = DateTime.Now,
                 ModifiedDate = DateTime.Now

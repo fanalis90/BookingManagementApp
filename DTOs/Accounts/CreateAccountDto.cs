@@ -1,4 +1,4 @@
-﻿using BookingManagementApp.Models;
+﻿using API.Models;
 
 namespace API.DTOs.Accounts
 {
@@ -16,7 +16,7 @@ namespace API.DTOs.Accounts
         {
             return new Account
             {
-                Guid = createAccountDto.Guid,
+                Guid = new Guid(),
                 OTP = createAccountDto.Otp,
                 IsUsed = createAccountDto.IsUsed,
                 Password = createAccountDto.Password,

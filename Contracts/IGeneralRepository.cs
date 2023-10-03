@@ -1,4 +1,4 @@
-﻿namespace BookingManagementApp.Contracts
+﻿namespace API.Contracts
 {
     public interface IGeneralRepository<TEntity> where TEntity : class
     {

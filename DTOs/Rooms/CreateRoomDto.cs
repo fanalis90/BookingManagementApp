@@ -1,4 +1,4 @@
-﻿using BookingManagementApp.Models;
+﻿using API.Models;
 
 namespace API.DTOs.Rooms
 {
@@ -15,7 +15,7 @@ namespace API.DTOs.Rooms
         {
             return new Room
             {
-                Guid = roomDto.Guid,
+                Guid = new Guid(),
                 Name = roomDto.Name,
                 Floor = roomDto.Floor,
                 Capacity = roomDto.Capacity,

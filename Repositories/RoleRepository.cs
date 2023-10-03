@@ -1,9 +1,9 @@
 ﻿using API.Repositories;
-using BookingManagementApp.Contracts;
-using BookingManagementApp.Data;
-using BookingManagementApp.Models;
+using API.Contracts;
+using API.Data;
+using API.Models;
 
-namespace BookingManagementApp.Repositories
+namespace API.Repositories
 {
     public class RoleRepository : GeneralRepository<Role>, IRoleRepository
     {

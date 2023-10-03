@@ -1,10 +1,8 @@
-﻿using API.Repositories;
-using BookingManagementApp.Contracts;
-using BookingManagementApp.Data;
-using BookingManagementApp.Models;
-using System.Linq.Expressions;
+﻿using API.Contracts;
+using API.Data;
+using API.Models;
 
-namespace BookingManagementApp.Repositories
+namespace API.Repositories
 {
     //membuat university repo untuk jembatan menuju database dengan implemen contract interface
     public class UniversityRepository : GeneralRepository<University>, IUniversityRepository

@@ -1,8 +1,17 @@
-﻿using BookingManagementApp.Contracts;
-using BookingManagementApp.Models;
+﻿using API.DTOs.Educations;
+using API.DTOs.Roles;
+using API.DTOs.Universities;
+using API.Contracts;
+using API.Models;
+using API.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using API.DTOs.Accounts;
+using API.Utilities.Handlers;
+using API.DTOs.Rooms;
+using API.Utilities.Handlers.Exceptions;
+using API.DTOs.AccountRoles;
 
-namespace BookingManagementApp.Controllers
+namespace API.Controllers
 {
     //membuat endpoint routing untuk role controller 
     [ApiController]
@@ -23,10 +32,10 @@ namespace BookingManagementApp.Controllers
             var result = _roleRepository.GetAll();
             if (!result.Any())
             {
-                return NotFound("Data Not Found");
+                return NotFound(new ResponseNotFoundHandler("Data Not Found"));
             }
-
-            return Ok(result);
+            var data = result.Select(i => (RoleDto)i);
+            return Ok(new ResponseOkHandler<IEnumerable<RoleDto>>(data));
         }
         //method get dari http untuk getByGuid role
         [HttpGet("{guid}")]
@@ -35,47 +44,73 @@ namespace BookingManagementApp.Controllers
             var result = _roleRepository.GetByGuid(guid);
             if (result is null)
             {
-                return NotFound("Data Not Found");
+                return NotFound(new ResponseNotFoundHandler("Data Not Found"));
 
             }
-            return Ok(result);
+            return Ok(new ResponseOkHandler<RoleDto>((RoleDto)result));
         }
         //method post dari http untuk create role
         [HttpPost]
-        public IActionResult Create(Role role)
+        public IActionResult Create(CreateRoleDto createRoleDto)
         {
-            var result = _roleRepository.Create(role);
-            if (result is null)
+            try
             {
-                return BadRequest("Failed To Create Data");
+                Role toCreate = createRoleDto;
+                toCreate.Guid = new Guid();
+                var result = _roleRepository.Create(toCreate);
+                return Ok(new ResponseOkHandler<RoleDto>((RoleDto)result));
+
             }
-            return Ok(result);
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseInternalServerErrorHandler("Failed to Create Data", e.Message));
+            }
         }
 
         //method put dari http untuk Update role
         [HttpPut]
-        public IActionResult Update(Role role)
+        public IActionResult Update(RoleDto roleDto)
         {
-            var result = _roleRepository.Update(role);
-            if (!result)
+            try
             {
-                return BadRequest("Failed To Update Data");
+                var entity = _roleRepository.GetByGuid(roleDto.Guid);
+                if (entity is null)
+                {
+                    return NotFound(new ResponseNotFoundHandler("Data Not Found"));
+
+                }
+                Role toUpdate = roleDto;
+                toUpdate.CreatedDate = entity.CreatedDate;
+                var result = _roleRepository.Update(roleDto);
+                return Ok(new ResponseOkHandler<String>("Data Updated"));
+
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseInternalServerErrorHandler("Failed to Create Data", e.Message));
             }
 
-            return Ok(result);
         }
         //method delete dari http untuk delete role
         [HttpDelete("{guid}")]
         public IActionResult Delete(Guid guid)
         {
-            var role = _roleRepository.GetByGuid(guid);
-            var result = _roleRepository.Delete(role);
-            if (!result)
+            try
             {
-                return BadRequest("Failed To Delete Data");
+                var role = _roleRepository.GetByGuid(guid);
+                if (role is null)
+                {
+                    return NotFound(new ResponseNotFoundHandler("Data Not Found"));
+
+                }
+                var result = _roleRepository.Delete(role);
+                return Ok(new ResponseOkHandler<String>("Data Deleted"));
+
+            } catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseInternalServerErrorHandler("Failed to Create Data", e.Message));
             }
 
-            return Ok(result);
         }
     }
 }

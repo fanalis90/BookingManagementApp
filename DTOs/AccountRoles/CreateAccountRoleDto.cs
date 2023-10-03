@@ -1,4 +1,4 @@
-﻿using BookingManagementApp.Models;
+﻿using API.Models;
 
 namespace API.DTOs.AccountRoles
 {
@@ -14,6 +14,7 @@ namespace API.DTOs.AccountRoles
         {
             return new AccountRole
             {
+                Guid = new Guid(),
                 RoleGuid = createAccountRoleDto.RoleGuid,
                 AccountGuid = createAccountRoleDto.AccountGuid,
                 CreatedDate = DateTime.Now,

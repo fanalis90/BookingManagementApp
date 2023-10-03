@@ -1,8 +1,9 @@
-﻿using BookingManagementApp.Utilities.Enum;
+﻿
+using API.Utilities.Enum;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BookingManagementApp.Models
+namespace API.Models
 {
     //membuat anotasi tabel dengan nama custom
     [Table("tb_tr_bookings")]

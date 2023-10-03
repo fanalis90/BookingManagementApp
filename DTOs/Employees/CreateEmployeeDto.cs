@@ -1,11 +1,11 @@
-﻿using BookingManagementApp.Models;
-using BookingManagementApp.Utilities.Enum;
+﻿
+using API.Models;
+using API.Utilities.Enum;
 
 namespace API.DTOs.Employees
 {
     public class CreateEmployeeDto
     {
-        public string Nik { get; set; }
         public string FirstName { get; set; }
         public string? LastName { get; set; }
         public DateTime BirthDate { get; set; }
@@ -20,7 +20,7 @@ namespace API.DTOs.Employees
         {
             return new Employee
             {
-                NIK = employeeDto.Nik,
+                Guid = new Guid(),
                 FirstName = employeeDto.FirstName,
                 LastName = employeeDto.LastName,
                 BirthDate = employeeDto.BirthDate,
@@ -28,6 +28,7 @@ namespace API.DTOs.Employees
                 HiringDate = employeeDto.HiringDate,
                 Email = employeeDto.Email,
                 PhoneNumber = employeeDto.PhoneNumber,
+                CreatedDate = DateTime.Now,
                 ModifiedDate = DateTime.Now
 
             };

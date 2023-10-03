@@ -1,5 +1,5 @@
-﻿using BookingManagementApp.Contracts;
-using BookingManagementApp.Data;
+﻿using API.Contracts;
+using API.Data;
 
 namespace API.Repositories
 {
@@ -22,7 +22,7 @@ namespace API.Repositories
             }
             catch
             {
-                return null;
+                throw;
             }
 
 
@@ -35,9 +35,9 @@ namespace API.Repositories
                 _context.Set<TEntity>().Remove(entity);
                 _context.SaveChanges();
                 return true;
-            } catch
+            } catch 
             {
-                return false;
+                throw;
             }
         }
         //method getall
@@ -60,7 +60,7 @@ namespace API.Repositories
                 return true;
             } catch
             {
-                return false;
+                throw;
             }
         }
     }

@@ -1,6 +1,6 @@
-﻿using BookingManagementApp.Models;
+﻿using API.Models;
 
-namespace BookingManagementApp.Contracts
+namespace API.Contracts
 {
     public interface IEmployeeRepository : IGeneralRepository<Employee>
     {

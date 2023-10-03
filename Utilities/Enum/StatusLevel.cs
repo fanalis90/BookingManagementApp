@@ -1,4 +1,4 @@
-﻿namespace BookingManagementApp.Utilities.Enum
+﻿namespace API.Utilities.Enum
 {
     //membuat enum status level
     public enum StatusLevel

@@ -1,6 +1,6 @@
 ﻿
 
-using BookingManagementApp.Models;
+using API.Models;
 
 namespace API.DTOs.Universities
 {
@@ -13,6 +13,7 @@ namespace API.DTOs.Universities
         {
             return new University
             {
+                Guid = new Guid(),
                 Code = createUniversityDto.Code,
                 Name = createUniversityDto.Name,
                 CreatedDate = DateTime.Now,

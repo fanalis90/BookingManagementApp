@@ -1,6 +1,5 @@
 ﻿using API.DTOs.Educations;
-using BookingManagementApp.Models;
-using BookingManagementApp.Utilities.Enum;
+using API.Models;
 
 namespace API.DTOs.Educations
 {

@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BookingManagementApp.Models
+namespace API.Models
 {
     public class BaseEntity
     {

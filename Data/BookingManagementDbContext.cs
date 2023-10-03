@@ -1,7 +1,7 @@
-﻿using BookingManagementApp.Models;
+﻿using API.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BookingManagementApp.Data
+namespace API.Data
 {
     public class BookingManagementDbContext : DbContext
     {

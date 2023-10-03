@@ -1,6 +1,7 @@
-﻿using API.DTOs.Employees;
-using BookingManagementApp.Models;
-using BookingManagementApp.Utilities.Enum;
+﻿
+
+using API.Models;
+using API.Utilities.Enum;
 
 namespace API.DTOs.Employees
 {
@@ -40,6 +41,7 @@ namespace API.DTOs.Employees
         {
             return new EmployeeDto
             {
+                Guid =employee.Guid,
                 Nik = employee.NIK,
                 FirstName = employee.FirstName,
                 LastName = employee.LastName,

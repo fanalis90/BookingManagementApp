@@ -1,9 +1,13 @@
 ﻿using API.DTOs.Universities;
-using BookingManagementApp.Contracts;
-using BookingManagementApp.Models;
+using API.Contracts;
+using API.Models;
 using Microsoft.AspNetCore.Mvc;
+using API.DTOs.Accounts;
+using API.Utilities.Handlers;
+using API.Utilities.Handlers.Exceptions;
+using API.DTOs.AccountRoles;
 
-namespace BookingManagementApp.Controllers
+namespace API.Controllers
 {
     //membuat endpoint routing untuk university controller 
     [ApiController]
@@ -24,7 +28,7 @@ namespace BookingManagementApp.Controllers
             var result = _universityRepository.GetAll();
             if (!result.Any())
             {
-                return NotFound("Data Not Found");
+                return NotFound(new ResponseNotFoundHandler("Data Not Found"));
             }
             var data = result.Select(u => (UniversityDto) u);
             /*var universityDto = new List<UniversityDto>();
@@ -32,7 +36,7 @@ namespace BookingManagementApp.Controllers
                {
                    universityDto.Add((UniversityDto) university);
                }*/
-            return Ok(data);
+            return Ok(new ResponseOkHandler<IEnumerable<UniversityDto>>(data));
         }
         //method get dari http untuk getByGuid university
         [HttpGet("{guid}")]
@@ -41,60 +45,73 @@ namespace BookingManagementApp.Controllers
             var result = _universityRepository.GetByGuid(guid);
             if(result is null)
             {
-                return NotFound("Data Not Found");
+                return NotFound(new ResponseNotFoundHandler("Data Not Found"));
 
             }
-            return Ok((UniversityDto) result);
+            return Ok(new ResponseOkHandler<UniversityDto>((UniversityDto)result));
         }
         //method post dari http untuk create university
         [HttpPost]
         public IActionResult Create(CreateUniversityDto createUniversityDto)
         {
-            var result = _universityRepository.Create(createUniversityDto);
-            if( result  is null)
+            try
             {
-                return BadRequest("Failed To Create Data");
+                University toCreate = createUniversityDto;
+                toCreate.Guid = new Guid();
+                var result = _universityRepository.Create(toCreate);
+                return Ok(new ResponseOkHandler<UniversityDto>((UniversityDto)result));
+
             }
-            return Ok((UniversityDto) result);
+            catch(Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseInternalServerErrorHandler("Failed to Create Data", e.Message));
+            }
         }
 
         //method put dari http untuk Update university
         [HttpPut]
         public IActionResult Update(UniversityDto universityDto)
         {
-            var entity = _universityRepository.GetByGuid(universityDto.Guid);
-            if (entity is null)
+            try
             {
-                return NotFound("Data Not Found");
+                var entity = _universityRepository.GetByGuid(universityDto.Guid);
+                if (entity is null)
+                {
+                    return NotFound(new ResponseNotFoundHandler("Data Not Found"));
+
+                }
+                University toUpdate = universityDto;
+                toUpdate.CreatedDate = entity.CreatedDate;
+
+                var result = _universityRepository.Update(toUpdate);
+                return Ok(new ResponseOkHandler<String>("Data Updated"));
 
             }
-            University toUpdate = universityDto;
-            toUpdate.CreatedDate = entity.CreatedDate;
-
-            var result = _universityRepository.Update(toUpdate);
-            if (!result)
+            catch (Exception e)
             {
-                return BadRequest("Failed To Update Data");
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseInternalServerErrorHandler("Failed to Create Data", e.Message));
             }
 
-            return Ok(result);
         }
         //method delete dari http untuk delete university
         [HttpDelete("{guid}")]
         public IActionResult Delete(Guid guid) {
-            var university = _universityRepository.GetByGuid(guid);
-            if (university is null)
+            try
             {
-                return NotFound("Data Not Found");
+                var university = _universityRepository.GetByGuid(guid);
+                if (university is null)
+                {
+                    return NotFound(new ResponseNotFoundHandler("Data Not Found"));
 
-            }
-            var result = _universityRepository.Delete(university);
-            if (!result)
+                }
+                var result = _universityRepository.Delete(university);
+
+                return Ok(new ResponseOkHandler<String>("Data Deleted"));
+
+            } catch (Exception e) 
             {
-                return BadRequest("Failed To Delete Data");
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseInternalServerErrorHandler("Failed to Create Data", e.Message));
             }
-
-            return Ok(result);
         }
     }
 }

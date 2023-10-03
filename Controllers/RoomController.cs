@@ -1,8 +1,16 @@
-﻿using BookingManagementApp.Contracts;
-using BookingManagementApp.Models;
+﻿using API.DTOs.Educations;
+using API.DTOs.Rooms;
+using API.DTOs.Universities;
+using API.Contracts;
+using API.Models;
+using API.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using API.DTOs.Accounts;
+using API.Utilities.Handlers;
+using API.Utilities.Handlers.Exceptions;
+using API.DTOs.AccountRoles;
 
-namespace BookingManagementApp.Controllers
+namespace API.Controllers
 {
     //membuat endpoint routing untuk room controller 
     [ApiController]
@@ -23,10 +31,10 @@ namespace BookingManagementApp.Controllers
             var result = _roomRepository.GetAll();
             if (!result.Any())
             {
-                return NotFound("Data Not Found");
+                return NotFound(new ResponseNotFoundHandler("Data Not Found"));
             }
-
-            return Ok(result);
+            var data = result.Select(i => (RoomDto)i);
+            return Ok(new ResponseOkHandler<IEnumerable<RoomDto>>(data));
         }
         //method get dari http untuk getByGuid room
         [HttpGet("{guid}")]
@@ -35,47 +43,73 @@ namespace BookingManagementApp.Controllers
             var result = _roomRepository.GetByGuid(guid);
             if (result is null)
             {
-                return NotFound("Data Not Found");
+                return NotFound(new ResponseNotFoundHandler("Data Not Found"));
 
             }
-            return Ok(result);
+            return Ok(new ResponseOkHandler<RoomDto>((RoomDto)result));
         }
         //method post dari http untuk create room
         [HttpPost]
-        public IActionResult Create(Room room)
+        public IActionResult Create(CreateRoomDto createRoomDto)
         {
-            var result = _roomRepository.Create(room);
-            if (result is null)
+            try
             {
-                return BadRequest("Failed To Create Data");
+                Room toCreate = createRoomDto;
+                toCreate.Guid = new Guid();
+                var result = _roomRepository.Create(toCreate);
+                return Ok(new ResponseOkHandler<RoomDto>((RoomDto)result));
+
             }
-            return Ok(result);
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseInternalServerErrorHandler("Failed to Create Data", e.Message));
+            }
         }
 
         //method put dari http untuk Update room
         [HttpPut]
-        public IActionResult Update(Room room)
+        public IActionResult Update(RoomDto roomDto)
         {
-            var result = _roomRepository.Update(room);
-            if (!result)
+            try
             {
-                return BadRequest("Failed To Update Data");
+                var entity = _roomRepository.GetByGuid(roomDto.Guid);
+                if (entity is null)
+                {
+                    return NotFound(new ResponseNotFoundHandler("Data Not Found"));
+
+                }
+                Room toUpdate = roomDto;
+                toUpdate.CreatedDate = entity.CreatedDate;
+                var result = _roomRepository.Update(roomDto);
+                return Ok(new ResponseOkHandler<String>("Data Updated"));
+
+            }
+            catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseInternalServerErrorHandler("Failed to Create Data", e.Message));
             }
 
-            return Ok(result);
         }
         //method delete dari http untuk delete room
         [HttpDelete("{guid}")]
         public IActionResult Delete(Guid guid)
         {
-            var room = _roomRepository.GetByGuid(guid);
-            var result = _roomRepository.Delete(room);
-            if (!result)
+            try
             {
-                return BadRequest("Failed To Delete Data");
-            }
+                var room = _roomRepository.GetByGuid(guid);
+                if (room is null)
+                {
+                    return NotFound(new ResponseNotFoundHandler("Data Not Found"));
 
-            return Ok(result);
+                }
+                var result = _roomRepository.Delete(room);
+                return Ok(new ResponseOkHandler<String>("Data Deleted"));
+
+            } catch (Exception e)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseInternalServerErrorHandler("Failed to Create Data", e.Message));
+            }
+            
         }
     }
 }

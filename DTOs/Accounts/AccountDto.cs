@@ -1,4 +1,4 @@
-﻿using BookingManagementApp.Models;
+﻿using API.Models;
 
 namespace API.DTOs.Accounts
 {

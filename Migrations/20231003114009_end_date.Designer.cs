@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BookingManagementApp.Migrations
 {
     [DbContext(typeof(BookingManagementDbContext))]
-    [Migration("20231002060102_alter_remark_booking_type")]
-    partial class alter_remark_booking_type
+    [Migration("20231003114009_end_date")]
+    partial class end_date
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -24,7 +24,7 @@ namespace BookingManagementApp.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("BookingManagementApp.Models.Account", b =>
+            modelBuilder.Entity("API.Models.Account", b =>
                 {
                     b.Property<Guid>("Guid")
                         .HasColumnType("uniqueidentifier")
@@ -60,7 +60,7 @@ namespace BookingManagementApp.Migrations
                     b.ToTable("tb_m_accounts");
                 });
 
-            modelBuilder.Entity("BookingManagementApp.Models.AccountRole", b =>
+            modelBuilder.Entity("API.Models.AccountRole", b =>
                 {
                     b.Property<Guid>("Guid")
                         .ValueGeneratedOnAdd()
@@ -92,7 +92,7 @@ namespace BookingManagementApp.Migrations
                     b.ToTable("tb_m_account_roles");
                 });
 
-            modelBuilder.Entity("BookingManagementApp.Models.Booking", b =>
+            modelBuilder.Entity("API.Models.Booking", b =>
                 {
                     b.Property<Guid>("Guid")
                         .ValueGeneratedOnAdd()
@@ -106,6 +106,10 @@ namespace BookingManagementApp.Migrations
                     b.Property<Guid>("EmployeeGuid")
                         .HasColumnType("uniqueidentifier")
                         .HasColumnName("employee_guid");
+
+                    b.Property<DateTime>("EndDate")
+                        .HasColumnType("datetime2")
+                        .HasColumnName("end_date");
 
                     b.Property<DateTime>("ModifiedDate")
                         .HasColumnType("datetime2")
@@ -137,7 +141,7 @@ namespace BookingManagementApp.Migrations
                     b.ToTable("tb_tr_bookings");
                 });
 
-            modelBuilder.Entity("BookingManagementApp.Models.Education", b =>
+            modelBuilder.Entity("API.Models.Education", b =>
                 {
                     b.Property<Guid>("Guid")
                         .HasColumnType("uniqueidentifier")
@@ -176,7 +180,7 @@ namespace BookingManagementApp.Migrations
                     b.ToTable("tb_m_educations");
                 });
 
-            modelBuilder.Entity("BookingManagementApp.Models.Employee", b =>
+            modelBuilder.Entity("API.Models.Employee", b =>
                 {
                     b.Property<Guid>("Guid")
                         .ValueGeneratedOnAdd()
@@ -235,7 +239,7 @@ namespace BookingManagementApp.Migrations
                     b.ToTable("tb_m_employees");
                 });
 
-            modelBuilder.Entity("BookingManagementApp.Models.Role", b =>
+            modelBuilder.Entity("API.Models.Role", b =>
                 {
                     b.Property<Guid>("Guid")
                         .ValueGeneratedOnAdd()
@@ -260,7 +264,7 @@ namespace BookingManagementApp.Migrations
                     b.ToTable("tb_m_roles");
                 });
 
-            modelBuilder.Entity("BookingManagementApp.Models.Room", b =>
+            modelBuilder.Entity("API.Models.Room", b =>
                 {
                     b.Property<Guid>("Guid")
                         .ValueGeneratedOnAdd()
@@ -293,7 +297,7 @@ namespace BookingManagementApp.Migrations
                     b.ToTable("tb_m_rooms");
                 });
 
-            modelBuilder.Entity("BookingManagementApp.Models.University", b =>
+            modelBuilder.Entity("API.Models.University", b =>
                 {
                     b.Property<Guid>("Guid")
                         .ValueGeneratedOnAdd()
@@ -323,26 +327,26 @@ namespace BookingManagementApp.Migrations
                     b.ToTable("tb_m_university");
                 });
 
-            modelBuilder.Entity("BookingManagementApp.Models.Account", b =>
+            modelBuilder.Entity("API.Models.Account", b =>
                 {
-                    b.HasOne("BookingManagementApp.Models.Employee", "Employee")
+                    b.HasOne("API.Models.Employee", "Employee")
                         .WithOne("Account")
-                        .HasForeignKey("BookingManagementApp.Models.Account", "Guid")
+                        .HasForeignKey("API.Models.Account", "Guid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Employee");
                 });
 
-            modelBuilder.Entity("BookingManagementApp.Models.AccountRole", b =>
+            modelBuilder.Entity("API.Models.AccountRole", b =>
                 {
-                    b.HasOne("BookingManagementApp.Models.Account", "Account")
+                    b.HasOne("API.Models.Account", "Account")
                         .WithMany("AccountRoles")
                         .HasForeignKey("AccountGuid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BookingManagementApp.Models.Role", "Role")
+                    b.HasOne("API.Models.Role", "Role")
                         .WithMany("AccountRoles")
                         .HasForeignKey("RoleGuid")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -353,15 +357,15 @@ namespace BookingManagementApp.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("BookingManagementApp.Models.Booking", b =>
+            modelBuilder.Entity("API.Models.Booking", b =>
                 {
-                    b.HasOne("BookingManagementApp.Models.Employee", "Employee")
+                    b.HasOne("API.Models.Employee", "Employee")
                         .WithMany("Bookings")
                         .HasForeignKey("EmployeeGuid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BookingManagementApp.Models.Room", "Room")
+                    b.HasOne("API.Models.Room", "Room")
                         .WithMany("Bookings")
                         .HasForeignKey("RoomGuid")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -372,15 +376,15 @@ namespace BookingManagementApp.Migrations
                     b.Navigation("Room");
                 });
 
-            modelBuilder.Entity("BookingManagementApp.Models.Education", b =>
+            modelBuilder.Entity("API.Models.Education", b =>
                 {
-                    b.HasOne("BookingManagementApp.Models.Employee", "Employee")
+                    b.HasOne("API.Models.Employee", "Employee")
                         .WithOne("Education")
-                        .HasForeignKey("BookingManagementApp.Models.Education", "Guid")
+                        .HasForeignKey("API.Models.Education", "Guid")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("BookingManagementApp.Models.University", "University")
+                    b.HasOne("API.Models.University", "University")
                         .WithMany("Educations")
                         .HasForeignKey("UniversityGuid")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -391,12 +395,12 @@ namespace BookingManagementApp.Migrations
                     b.Navigation("University");
                 });
 
-            modelBuilder.Entity("BookingManagementApp.Models.Account", b =>
+            modelBuilder.Entity("API.Models.Account", b =>
                 {
                     b.Navigation("AccountRoles");
                 });
 
-            modelBuilder.Entity("BookingManagementApp.Models.Employee", b =>
+            modelBuilder.Entity("API.Models.Employee", b =>
                 {
                     b.Navigation("Account");
 
@@ -405,17 +409,17 @@ namespace BookingManagementApp.Migrations
                     b.Navigation("Education");
                 });
 
-            modelBuilder.Entity("BookingManagementApp.Models.Role", b =>
+            modelBuilder.Entity("API.Models.Role", b =>
                 {
                     b.Navigation("AccountRoles");
                 });
 
-            modelBuilder.Entity("BookingManagementApp.Models.Room", b =>
+            modelBuilder.Entity("API.Models.Room", b =>
                 {
                     b.Navigation("Bookings");
                 });
 
-            modelBuilder.Entity("BookingManagementApp.Models.University", b =>
+            modelBuilder.Entity("API.Models.University", b =>
                 {
                     b.Navigation("Educations");
                 });

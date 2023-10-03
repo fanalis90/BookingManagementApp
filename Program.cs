@@ -1,6 +1,6 @@
-using BookingManagementApp.Contracts;
-using BookingManagementApp.Data;
-using BookingManagementApp.Repositories;
+using API.Contracts;
+using API.Data;
+using API.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
