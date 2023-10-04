@@ -3,19 +3,19 @@ using FluentValidation;
 
 namespace API.Utilities.Validations.Education
 {
-    public class CreateEducationValidator : AbstractValidator<CreateEducationDto>
+    public class UpdateEducationValidator : AbstractValidator<EducationDto>
     {
-        //validator untuk create education
-        public CreateEducationValidator()
+        //validation untuk update education
+        public UpdateEducationValidator()
         {
             RuleFor(e => e.Guid)
-                .NotEmpty();
+            .NotEmpty();
 
             RuleFor(e => e.Major)
-                .NotEmpty(); 
-            
+                .NotEmpty();
+
             RuleFor(e => e.Degree)
-                .NotEmpty(); 
+                .NotEmpty();
 
             //membuat aturan gpa lebih dari 0.0 dan krang dr 4.0
             RuleFor(e => e.Gpa)

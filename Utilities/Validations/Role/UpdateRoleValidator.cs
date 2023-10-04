@@ -3,12 +3,14 @@ using FluentValidation;
 
 namespace API.Utilities.Validations.Role
 {
-    public class CreateRoleValidator : AbstractValidator<CreateRoleDto>
+    public class UpdateRoleValidator : AbstractValidator<RoleDto>
     {
-
-        //validation untuk create role
-        public CreateRoleValidator()
+        //validation untuk update role
+        public UpdateRoleValidator()
         {
+            RuleFor(r => r.Guid)
+                .NotEmpty();
+
             RuleFor(r => r.Name)
                 .NotEmpty()
                 .MaximumLength(100);

@@ -1,20 +1,23 @@
 ﻿using API.DTOs.Employees;
-using API.Utilities.Enum;
 using FluentValidation;
 
 namespace API.Utilities.Validations.Employee
 {
-    public class CreateEmployeeValidator : AbstractValidator<CreateEmployeeDto>
+    public class UpdateEmployeeValidator : AbstractValidator<EmployeeDto>
     {
-        //membuat validator untuk create employee
-        public CreateEmployeeValidator() {
+        //validation untuk employee update
+        public UpdateEmployeeValidator()
+        {
+            RuleFor(e => e.Guid).NotEmpty();
+
             RuleFor(e => e.FirstName)
-                .NotEmpty();
+               .NotEmpty();
 
             RuleFor(e => e.BirthDate)
                 .NotEmpty()
                 .LessThan(DateTime.Now.AddYears(-18));
-            //notnull agar bisa isi 0
+
+            //not null supaya boleh mengisi 0
             RuleFor(e => e.Gender)
                 .NotNull()
                 .IsInEnum();
@@ -28,6 +31,5 @@ namespace API.Utilities.Validations.Employee
                .MinimumLength(9)
                .MinimumLength(20);
         }
-
     }
 }

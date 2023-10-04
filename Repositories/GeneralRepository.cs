@@ -1,5 +1,6 @@
 ﻿using API.Contracts;
 using API.Data;
+using API.Utilities.Handlers.Exceptions;
 
 namespace API.Repositories
 {
@@ -20,9 +21,21 @@ namespace API.Repositories
                 _context.SaveChanges();
                 return entity;
             }
-            catch
+            catch (Exception ex)
             {
-                throw;
+                if (ex.InnerException is not null && ex.InnerException.Message.Contains("IX_tb_m_employees_nik"))
+                {
+                    throw new ExceptionHandler("NIK already exists");
+                }
+                if (ex.InnerException is not null && ex.InnerException.Message.Contains("IX_tb_m_employees_email"))
+                {
+                    throw new ExceptionHandler("Email already exists");
+                }
+                if (ex.InnerException != null && ex.InnerException.Message.Contains("IX_tb_m_employees_phone_number"))
+                {
+                    throw new ExceptionHandler("Phone number already exists");
+                }
+                throw new ExceptionHandler(ex.InnerException?.Message ?? ex.Message);
             }
 
 
@@ -58,9 +71,21 @@ namespace API.Repositories
                 _context.Set<TEntity>().Update(entity);
                 _context.SaveChanges();
                 return true;
-            } catch
+            } catch (Exception ex)
             {
-                throw;
+                if (ex.InnerException is not null && ex.InnerException.Message.Contains("IX_tb_m_employees_nik"))
+                {
+                    throw new ExceptionHandler("NIK already exists");
+                }
+                if (ex.InnerException is not null && ex.InnerException.Message.Contains("IX_tb_m_employees_email"))
+                {
+                    throw new ExceptionHandler("Email already exists");
+                }
+                if (ex.InnerException != null && ex.InnerException.Message.Contains("IX_tb_m_employees_phone_number"))
+                {
+                    throw new ExceptionHandler("Phone number already exists");
+                }
+                throw new ExceptionHandler(ex.InnerException?.Message ?? ex.Message);
             }
         }
     }

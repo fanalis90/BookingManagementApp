@@ -3,11 +3,14 @@ using FluentValidation;
 
 namespace API.Utilities.Validations.Room
 {
-    public class CreateRoomValidator : AbstractValidator<CreateRoomDto>
+    public class UpdateRoomValidator : AbstractValidator<RoomDto>
     {
-        //validation untuk create rooms
-        public CreateRoomValidator()
+        //validation untuk update room
+        public UpdateRoomValidator()
         {
+            RuleFor(r => r.Guid)
+                .NotEmpty();
+
             RuleFor(r => r.Name)
                 .NotEmpty()
                 .MaximumLength(100);
@@ -18,6 +21,5 @@ namespace API.Utilities.Validations.Room
             RuleFor(r => r.Capacity)
                 .NotEmpty();
         }
-
     }
 }

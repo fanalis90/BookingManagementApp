@@ -6,19 +6,17 @@ namespace API.Utilities.Handlers
     public class GenerateNIKHandler
     {
         //method untuk menggenerate nik pada employee
-        public static string GenerateNIK(IEmployeeRepository repo)
+        public static string GenerateNIK(String? lastNik = null)
         {
-            var NIK = repo.GetAll().OrderByDescending(e => e.NIK).Select(e => e.NIK).FirstOrDefault();
-
-            int lastNik = 0;
-            if(!string.IsNullOrEmpty(NIK) && int.TryParse(NIK,out lastNik)) {
-                lastNik++;
-            } else
-            {
-                lastNik = 111111;
+            if(lastNik == null) {
+                return "111111";
+                
             }
+            
+                var nik = Convert.ToInt32(lastNik) + 1;
+            
 
-            return lastNik.ToString("D6");
+            return nik.ToString("D6");
             
         }
     }
