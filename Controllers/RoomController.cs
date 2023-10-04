@@ -55,7 +55,6 @@ namespace API.Controllers
             try
             {
                 Room toCreate = createRoomDto;
-                toCreate.Guid = new Guid();
                 var result = _roomRepository.Create(toCreate);
                 return Ok(new ResponseOkHandler<RoomDto>((RoomDto)result));
 

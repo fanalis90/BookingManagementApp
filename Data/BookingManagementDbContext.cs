@@ -20,12 +20,9 @@ namespace API.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            modelBuilder.Entity<Employee>().HasIndex(e => new
-            {
-                e.NIK,
-                e.Email,
-                e.PhoneNumber
-            }).IsUnique();
+            modelBuilder.Entity<Employee>().HasIndex(e => e.NIK).IsUnique();
+            modelBuilder.Entity<Employee>().HasIndex(e => e.PhoneNumber).IsUnique();
+            modelBuilder.Entity<Employee>().HasIndex(e => e.Email).IsUnique();
 
             modelBuilder.Entity<University>()
                 .HasMany(e => e.Educations)

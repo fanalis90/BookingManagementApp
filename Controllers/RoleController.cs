@@ -56,7 +56,7 @@ namespace API.Controllers
             try
             {
                 Role toCreate = createRoleDto;
-                toCreate.Guid = new Guid();
+    
                 var result = _roleRepository.Create(toCreate);
                 return Ok(new ResponseOkHandler<RoleDto>((RoleDto)result));
 

@@ -16,7 +16,7 @@ namespace API.DTOs.Accounts
         {
             return new Account
             {
-                Guid = new Guid(),
+                Guid = createAccountDto.Guid,
                 OTP = createAccountDto.Otp,
                 IsUsed = createAccountDto.IsUsed,
                 Password = createAccountDto.Password,

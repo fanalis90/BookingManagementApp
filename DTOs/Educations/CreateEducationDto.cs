@@ -4,6 +4,7 @@ namespace API.DTOs.Educations
 {
     public class CreateEducationDto
     {
+        public Guid Guid {  get; set; }
         public string Major { get; set; }
         public string Degree { get; set; }
         public float Gpa { get; set; }
@@ -15,7 +16,7 @@ namespace API.DTOs.Educations
         {
             return new Education
             {
-                Guid = new Guid(),
+                Guid = createEducationDto.Guid,
                 Major = createEducationDto.Major,
                 Degree = createEducationDto.Degree,
                 GPA = createEducationDto.Gpa,

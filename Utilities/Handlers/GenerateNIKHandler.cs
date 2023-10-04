@@ -2,8 +2,10 @@
 
 namespace API.Utilities.Handlers
 {
+
     public class GenerateNIKHandler
     {
+        //method untuk menggenerate nik pada employee
         public static string GenerateNIK(IEmployeeRepository repo)
         {
             var NIK = repo.GetAll().OrderByDescending(e => e.NIK).Select(e => e.NIK).FirstOrDefault();
@@ -16,7 +18,7 @@ namespace API.Utilities.Handlers
                 lastNik = 111111;
             }
 
-            return lastNik.ToString("D5");
+            return lastNik.ToString("D6");
             
         }
     }

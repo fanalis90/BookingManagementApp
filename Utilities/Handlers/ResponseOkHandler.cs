@@ -2,6 +2,8 @@
 
 namespace API.Utilities.Handlers
 {
+
+    //class untuk response ok 
     public class ResponseOkHandler<TEntity>
 
     {
@@ -10,6 +12,7 @@ namespace API.Utilities.Handlers
         public string Message { get; set; }
         public TEntity? Data { get; set; }
 
+        //constructor untuk method get
         public ResponseOkHandler (TEntity? data)
         {
             Code = StatusCodes.Status200OK;
@@ -17,6 +20,7 @@ namespace API.Utilities.Handlers
             Message = "Success to Retrieve Data";
             Data = data;
         }
+        //construktor method update, delete
         public ResponseOkHandler(string message)
         {
             Code = StatusCodes.Status200OK;

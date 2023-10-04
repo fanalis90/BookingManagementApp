@@ -57,9 +57,8 @@ namespace API.Controllers
             try
             {
                 University toCreate = createUniversityDto;
-                toCreate.Guid = new Guid();
                 var result = _universityRepository.Create(toCreate);
-                return Ok(new ResponseOkHandler<UniversityDto>((UniversityDto)result));
+                return Ok(new ResponseOkHandler<UniversityDto>((UniversityDto) result));
 
             }
             catch(Exception e)

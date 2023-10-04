@@ -2,6 +2,7 @@
 
 namespace API.Utilities.Handlers.Exceptions
 {
+    //kelas khusus untuk notfound error
     public class ResponseNotFoundHandler : ResponseErrorHandler
     {
         public ResponseNotFoundHandler(string message) {

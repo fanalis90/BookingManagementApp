@@ -1,5 +1,6 @@
 ﻿namespace API.Utilities.Handlers.Exceptions
 {
+    //membuat ckass untuk response error
     public class ResponseErrorHandler
     {
         public int Code { get; set; }
