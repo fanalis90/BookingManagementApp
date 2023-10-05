@@ -26,7 +26,7 @@ namespace API.Utilities.Validations.Employee
             RuleFor(e => e.PhoneNumber)
                .NotEmpty()
                .MinimumLength(9)
-               .MinimumLength(20);
+               .MaximumLength(20);
         }
 
     }
