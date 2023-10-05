@@ -13,7 +13,7 @@ namespace API.Utilities.Validations.Account
                 .NotEmpty();
 
             RuleFor(a => a.Otp)
-                .NotEmpty();
+                .NotNull();
 
             RuleFor(a => a.ExpiredTime)
                 .NotEmpty();

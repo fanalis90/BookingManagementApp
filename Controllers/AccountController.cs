@@ -15,11 +15,69 @@ namespace API.Controllers
     {
         //membuat account repository untuk mengakses database sebagai readonly dan private
         private readonly IAccountRepository _accountRepository;
+        private readonly IEmployeeRepository _employeeRepository;
         //dependency injection dilakukan
-        public AccountController(IAccountRepository accountRepository)
+        public AccountController(IAccountRepository accountRepository, IEmployeeRepository employeeRepository)
         {
             _accountRepository = accountRepository;
+            _employeeRepository = employeeRepository;
         }
+
+        [HttpPost("ForgotPassword")]
+        public IActionResult ForgotPassword(ForgotPasswordDto forgotPasswordDto)
+        {
+            var employee = _employeeRepository.GetByEmail(forgotPasswordDto.Email);
+            if(employee is null)
+            {
+                return NotFound(new ResponseNotFoundHandler("Data Not Found"));
+            }
+            var account = _accountRepository.GetByGuid(employee.Guid);
+            if(account == null)
+            {
+                return NotFound(new ResponseNotFoundHandler("Data Not Found"));
+            }
+            account.OTP = GenerateOTP.GenerateOTPHandler();
+            account.ExpiredTime = DateTime.Now.AddMinutes(5);
+            account.IsUsed = false;
+            _accountRepository.Update(account);
+            return Ok(new ResponseOkHandler<ForgotPasswordResponseDto>((ForgotPasswordResponseDto)account));
+        }
+
+        [HttpPost("ChangePassword")]
+        public IActionResult ChangePassword(ChangePasswordDto changePasswordDto)
+        {
+            var employee = _employeeRepository.GetByEmail(changePasswordDto.Email);
+            if (employee == null)
+            {
+                return NotFound(new ResponseNotFoundHandler("Data Not Found"));
+            }
+            var account = _accountRepository.GetByGuid(employee.Guid);
+            if (account == null)
+            {
+                return NotFound(new ResponseNotFoundHandler("Data Not Found"));
+            }
+            if (account.OTP != changePasswordDto.Otp)
+            {
+                return BadRequest(new ResponseBadRequestHandler("OTP dont Match"));
+            }
+            if (DateTime.Now > account.ExpiredTime)
+            {
+                return BadRequest(new ResponseBadRequestHandler("OTP is expired"));
+            }
+            if (account.IsUsed == true)
+            {
+                return BadRequest(new ResponseBadRequestHandler("OTP is Used"));
+            }
+            if (changePasswordDto.NewPassword != changePasswordDto.ConfirmPassword) 
+            { 
+                return BadRequest(new ResponseBadRequestHandler("Password dont Match"));
+            }
+            account.Password = HashHandler.HashPassword(changePasswordDto.NewPassword);
+            account.IsUsed = true;
+            _accountRepository.Update(account);
+            return Ok(new ResponseOkHandler<AccountDto>((AccountDto) account));
+        }
+
         //method get dari http untuk getall universities
         [HttpGet]
         public IActionResult GetAll()

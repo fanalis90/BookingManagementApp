@@ -5,6 +5,7 @@
 
 appsettings.json
 Services/
+appsettings.Development.json
 
 
 

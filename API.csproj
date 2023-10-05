@@ -20,6 +20,7 @@
 
   <ItemGroup>
 	<Folder Include="Contracts\" />
+	<Folder Include="Services\" />
   </ItemGroup>
 
 </Project>

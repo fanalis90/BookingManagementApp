@@ -20,11 +20,113 @@ namespace API.Controllers
     {
         //membuat employee repository untuk mengakses database sebagai readonly dan private
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly IEducationRepository _educationRepository;
+        private readonly IUniversityRepository _universityRepository;
+        private readonly IAccountRepository _accountRepository;
         //dependency injection dilakukan
-        public EmployeeController(IEmployeeRepository employeeRepository)
+        public EmployeeController(IEmployeeRepository employeeRepository, IEducationRepository educationRepository, IUniversityRepository universityRepository, IAccountRepository accountRepository)
         {
             _employeeRepository = employeeRepository;
+            _educationRepository = educationRepository;
+            _universityRepository = universityRepository;
+            _accountRepository = accountRepository;
         }
+        [HttpPost("Login")]
+        public IActionResult Login(LoginDto loginDto)
+        {
+            var employee = _employeeRepository.GetByEmail(loginDto.Email);
+            if(employee is null)
+            {
+                return BadRequest(new ResponseBadRequestHandler("Email or Password is invalid"));
+            }
+            var account = _accountRepository.GetByGuid(employee.Guid);
+            if (account is null)
+            {
+                return NotFound(new ResponseNotFoundHandler("Account Not Found"));
+            }
+            var isValidPassword = HashHandler.verifvyPassword(loginDto.Password, account.Password);
+            if (!isValidPassword)
+            {
+                return BadRequest(new ResponseBadRequestHandler("Email or Password is invalid"));
+            }
+            return Ok(new ResponseOkHandler<string>("Login Success"));
+        }
+        
+        [HttpPost("Register")]
+        public IActionResult Register(RegisterDto registerDto)
+        {
+            var employee = _employeeRepository.GetByEmail(registerDto.Email);
+            if(employee is null)
+            {
+                employee = registerDto;
+                employee.NIK = GenerateNIKHandler.GenerateNIK(_employeeRepository.GetLastNik());
+                employee = _employeeRepository.Create(employee);
+            } else
+            {
+                return BadRequest(new ResponseBadRequestHandler("Email is Used"));
+            }
+            
+            var university = _universityRepository.GetUniversityNameByCode(registerDto.UniversityCode);
+            if (university is null)
+            {
+                university = _universityRepository.Create(registerDto);
+            }
+
+            if (registerDto.Password != registerDto.ConfirmPassword)
+            { 
+                return BadRequest(new ResponseBadRequestHandler("Password dont Match"));
+            }
+
+            var education = _educationRepository.GetByGuid(employee.Guid);
+            if (education is null)
+            {
+                Education educationcreate = registerDto;
+                educationcreate.Guid = employee.Guid;
+                educationcreate.UniversityGuid = university.Guid;
+                _educationRepository.Create(educationcreate);
+            }
+            Account account = registerDto;
+            account.Guid = employee.Guid;
+            account.Password = HashHandler.HashPassword(registerDto.Password);
+            EmployeeDetailsDto responseRegister = (EmployeeDetailsDto) registerDto;
+            responseRegister.Guid = employee.Guid;
+            responseRegister.Nik = employee.NIK;
+            responseRegister.University = university.Name;
+            return Ok(new ResponseOkHandler<EmployeeDetailsDto>(responseRegister));
+        }
+
+        [HttpGet("details")]
+        public IActionResult GetDetails()
+        {
+            var employee = _employeeRepository.GetAll();
+            var education = _educationRepository.GetAll();
+            var university = _universityRepository.GetAll();
+            if(!(employee.Any() && education.Any() && university.Any()))
+            {
+                return NotFound(new ResponseNotFoundHandler("Data Not Found"));
+            }
+            var employeeDetails = from emp in employee
+                                  join edu in education on emp.Guid equals edu.Guid
+                                  join unv in university on edu.UniversityGuid equals unv.Guid
+                                  select new EmployeeDetailsDto
+                                  {
+                                      Guid = emp.Guid,
+                                      Nik = emp.NIK,
+                                      FullName = string.Concat(emp.FirstName, " ", emp.LastName),
+                                      BirthDate = emp.BirthDate,
+                                      Gender = emp.Gender.ToString(),
+                                      HiringDate = emp.HiringDate,
+                                      Email = emp.Email,
+                                      PhoneNumber = emp.PhoneNumber,
+                                      Major = edu.Major,
+                                      Degree = edu.Degree,
+                                      Gpa = edu.GPA,
+                                      University = unv.Name
+                                  };
+
+            return Ok(new ResponseOkHandler<IEnumerable<EmployeeDetailsDto>>(employeeDetails));
+        }
+
         //method get dari http untuk getall universities
         [HttpGet]
         public IActionResult GetAll()

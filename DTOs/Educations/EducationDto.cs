@@ -35,6 +35,7 @@ namespace API.DTOs.Educations
                 Major = education.Major,
                 Degree = education.Degree,
                 Gpa = education.GPA,
+                UniversityGuid = education.UniversityGuid
 
             };
         }
