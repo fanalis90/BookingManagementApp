@@ -5,6 +5,7 @@ using API.Models;
 using Microsoft.AspNetCore.Mvc;
 using API.Utilities.Handlers.Exceptions;
 using API.DTOs.AccountRoles;
+using API.Repositories;
 
 namespace API.Controllers
 {
@@ -16,11 +17,17 @@ namespace API.Controllers
         //membuat account repository untuk mengakses database sebagai readonly dan private
         private readonly IAccountRepository _accountRepository;
         private readonly IEmployeeRepository _employeeRepository;
+        private readonly IUniversityRepository _universityRepository;
+        private readonly IEducationRepository _educationRepository;
+        private readonly IEmailHandler _emailHandler;
         //dependency injection dilakukan
-        public AccountController(IAccountRepository accountRepository, IEmployeeRepository employeeRepository)
+        public AccountController(IAccountRepository accountRepository, IEmployeeRepository employeeRepository, IEducationRepository educationRepository , IUniversityRepository universityRepository, IEmailHandler emailHandler)
         {
             _accountRepository = accountRepository;
             _employeeRepository = employeeRepository;
+            _educationRepository = educationRepository;
+            _universityRepository = universityRepository;
+            _emailHandler = emailHandler;
         }
 
         [HttpPost("ForgotPassword")]
@@ -34,12 +41,13 @@ namespace API.Controllers
             var account = _accountRepository.GetByGuid(employee.Guid);
             if(account == null)
             {
-                return NotFound(new ResponseNotFoundHandler("Data Not Found"));
+                return NotFound(new ResponseNotFoundHandler("Account Not Found"));
             }
-            account.OTP = GenerateOTP.GenerateOTPHandler();
+            account.OTP = new Random().Next(100000, 1000000);
             account.ExpiredTime = DateTime.Now.AddMinutes(5);
             account.IsUsed = false;
             _accountRepository.Update(account);
+            _emailHandler.Send("Forgot Password", $"Your OTP is {account.OTP}", forgotPasswordDto.Email);
             return Ok(new ResponseOkHandler<ForgotPasswordResponseDto>((ForgotPasswordResponseDto)account));
         }
 
@@ -54,7 +62,7 @@ namespace API.Controllers
             var account = _accountRepository.GetByGuid(employee.Guid);
             if (account == null)
             {
-                return NotFound(new ResponseNotFoundHandler("Data Not Found"));
+                return NotFound(new ResponseNotFoundHandler("Account Not Found"));
             }
             if (account.OTP != changePasswordDto.Otp)
             {
@@ -66,7 +74,7 @@ namespace API.Controllers
             }
             if (account.IsUsed == true)
             {
-                return BadRequest(new ResponseBadRequestHandler("OTP is Used"));
+                return BadRequest(new ResponseBadRequestHandler("OTP is already Used"));
             }
             if (changePasswordDto.NewPassword != changePasswordDto.ConfirmPassword) 
             { 
@@ -76,6 +84,67 @@ namespace API.Controllers
             account.IsUsed = true;
             _accountRepository.Update(account);
             return Ok(new ResponseOkHandler<AccountDto>((AccountDto) account));
+        }
+
+        [HttpPost("Login")]
+        public IActionResult Login(LoginDto loginDto)
+        {
+            var employee = _employeeRepository.GetByEmail(loginDto.Email);
+            if (employee is null)
+            {
+                return BadRequest(new ResponseBadRequestHandler("Email or Password is invalid"));
+            }
+            var account = _accountRepository.GetByGuid(employee.Guid);
+            if (account is null)
+            {
+                return NotFound(new ResponseNotFoundHandler("Account Not Found"));
+            }
+            var isValidPassword = HashHandler.verifvyPassword(loginDto.Password, account.Password);
+            if (!isValidPassword)
+            {
+                return BadRequest(new ResponseBadRequestHandler("Email or Password is invalid"));
+            }
+            return Ok(new ResponseOkHandler<string>("Login Success"));
+        }
+
+        [HttpPost("Register")]
+        public IActionResult Register(RegisterDto registerDto)
+        {
+            var employee = _employeeRepository.GetByEmail(registerDto.Email);
+            if (employee is null)
+            {
+                employee = registerDto;
+                employee.NIK = GenerateNIKHandler.GenerateNIK(_employeeRepository.GetLastNik());
+                employee = _employeeRepository.Create(employee);
+            }
+            else
+            {
+                return BadRequest(new ResponseBadRequestHandler("Email is Used"));
+            }
+
+            var university = _universityRepository.GetUniversityNameByCode(registerDto.UniversityCode);
+            if (university is null)
+            {
+                university = _universityRepository.Create(registerDto);
+            }
+
+            var education = _educationRepository.GetByGuid(employee.Guid);
+            if (education is null)
+            {
+                Education educationcreate = registerDto;
+                educationcreate.Guid = employee.Guid;
+                educationcreate.UniversityGuid = university.Guid;
+                _educationRepository.Create(educationcreate);
+            }
+            Account account = registerDto;
+            account.Guid = employee.Guid;
+            account.Password = HashHandler.HashPassword(registerDto.Password);
+
+            EmployeeDetailsDto responseRegister = (EmployeeDetailsDto)registerDto;
+            responseRegister.Guid = employee.Guid;
+            responseRegister.Nik = employee.NIK;
+            responseRegister.University = university.Name;
+            return Ok(new ResponseOkHandler<EmployeeDetailsDto>(responseRegister));
         }
 
         //method get dari http untuk getall universities

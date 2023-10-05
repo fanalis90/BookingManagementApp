@@ -22,6 +22,7 @@ namespace API.Utilities.Validations.Account
                 .MinimumLength(8)
                 .Matches("[A-Z]")
                 .Matches("[a-z]")
+                .Matches("[0-9]")
                 .Matches("[!@#$%^&*()_+\\-=\\[\\]{};':\",.<>?]");
             //
             RuleFor(a => a.IsUsed)

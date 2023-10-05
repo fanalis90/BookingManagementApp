@@ -3,7 +3,7 @@ using API.DTOs.Universities;
 using API.Models;
 using API.Utilities.Enum;
 
-namespace API.DTOs.Employees
+namespace API.DTOs.Accounts
 {
     public class RegisterDto
     {
@@ -20,7 +20,7 @@ namespace API.DTOs.Employees
         public string UniversityCode { get; set; }
         public string UniversityName { get; set; }
         public string Password { get; set; }
-        public string ConfirmPassword {  get; set; }
+        public string ConfirmPassword { get; set; }
 
         //membuat implicit operator untuk create
         public static implicit operator Employee(RegisterDto employeeDto)

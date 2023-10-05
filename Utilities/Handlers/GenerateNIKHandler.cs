@@ -1,6 +1,4 @@
-﻿using API.Contracts;
-
-namespace API.Utilities.Handlers
+﻿namespace API.Utilities.Handlers
 {
 
     public class GenerateNIKHandler
@@ -8,16 +6,17 @@ namespace API.Utilities.Handlers
         //method untuk menggenerate nik pada employee
         public static string GenerateNIK(String? lastNik = null)
         {
-            if(lastNik == null) {
+            if(lastNik == null)
+            {
                 return "111111";
-                
+
             }
-            
-                var nik = Convert.ToInt32(lastNik) + 1;
-            
+
+            var nik = Convert.ToInt32(lastNik) + 1;
+
 
             return nik.ToString("D6");
-            
+
         }
     }
 }

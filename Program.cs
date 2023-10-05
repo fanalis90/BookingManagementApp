@@ -24,6 +24,10 @@ builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IRoleRepository, RoleRepository>();
 builder.Services.AddScoped<IRoomRepository, RoomRepository>();
 
+//add email service
+builder.Services.AddTransient<IEmailHandler, EmailHandler>( _ => new EmailHandler(
+    builder.Configuration["SmtpService:Server"], Convert.ToInt32(builder.Configuration["SmtpService:Port"]), builder.Configuration["SmtpService:FromEmailAddress"]));
+
 //add Fluent Validation Service
 builder.Services.AddFluentValidationAutoValidation()
     .AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());

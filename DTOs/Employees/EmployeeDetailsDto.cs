@@ -1,7 +1,7 @@
-﻿using API.DTOs.Employees;
+﻿using API.DTOs.Accounts;
 using API.Models;
 
-    public class EmployeeDetailsDto
+public class EmployeeDetailsDto
     {
         public Guid Guid { get; set; }
         public string Nik { get; set; }
@@ -22,7 +22,7 @@ using API.Models;
             return new EmployeeDetailsDto
             {
   
-                FullName = RegisterDto.FirstName + RegisterDto.LastName,
+                FullName = RegisterDto.FirstName +" "+ RegisterDto.LastName,
                 BirthDate = RegisterDto.BirthDate,
                 Gender = RegisterDto.Gender.ToString(),
                 HiringDate = RegisterDto.HiringDate,

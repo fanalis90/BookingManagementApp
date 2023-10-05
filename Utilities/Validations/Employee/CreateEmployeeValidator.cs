@@ -19,6 +19,9 @@ namespace API.Utilities.Validations.Employee
                 .NotNull()
                 .IsInEnum();
 
+            RuleFor(r => r.HiringDate)
+             .NotEmpty();
+
             RuleFor(e => e.Email)
                 .NotEmpty()
                 .EmailAddress();
