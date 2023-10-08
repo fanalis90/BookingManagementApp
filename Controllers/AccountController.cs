@@ -6,12 +6,15 @@ using Microsoft.AspNetCore.Mvc;
 using API.Utilities.Handlers.Exceptions;
 using API.DTOs.AccountRoles;
 using API.Repositories;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
     //membuat endpoint routing untuk account controller 
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize()]
     public class AccountController : ControllerBase
     {
         //membuat account repository untuk mengakses database sebagai readonly dan private
@@ -19,39 +22,58 @@ namespace API.Controllers
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IUniversityRepository _universityRepository;
         private readonly IEducationRepository _educationRepository;
+        private readonly IAccountRoleRepository _accountRoleRepository;
+        private readonly IRoleRepository _roleRepository;
         private readonly IEmailHandler _emailHandler;
+        private readonly IJWTokenHandler _tokenHandler;
         //dependency injection dilakukan
-        public AccountController(IAccountRepository accountRepository, IEmployeeRepository employeeRepository, IEducationRepository educationRepository , IUniversityRepository universityRepository, IEmailHandler emailHandler)
+        public AccountController(IAccountRepository accountRepository, IEmployeeRepository employeeRepository, IEducationRepository educationRepository, IUniversityRepository universityRepository, IEmailHandler emailHandler, IJWTokenHandler tokenHandler, IAccountRoleRepository accountRoleRepository, IRoleRepository roleRepository)
         {
             _accountRepository = accountRepository;
             _employeeRepository = employeeRepository;
             _educationRepository = educationRepository;
             _universityRepository = universityRepository;
             _emailHandler = emailHandler;
+            _tokenHandler = tokenHandler;
+            _accountRoleRepository = accountRoleRepository;
+            _roleRepository = roleRepository;
         }
 
         [HttpPost("ForgotPassword")]
+        [AllowAnonymous]
         public IActionResult ForgotPassword(ForgotPasswordDto forgotPasswordDto)
         {
-            var employee = _employeeRepository.GetByEmail(forgotPasswordDto.Email);
-            if(employee is null)
+            try
             {
-                return NotFound(new ResponseNotFoundHandler("Data Not Found"));
+                var employee = _employeeRepository.GetByEmail(forgotPasswordDto.Email);
+                if (employee is null)
+                {
+                    return NotFound(new ResponseNotFoundHandler("Data Not Found"));
+                }
+                var account = _accountRepository.GetByGuid(employee.Guid);
+                if (account == null)
+                {
+                    return NotFound(new ResponseNotFoundHandler("Account Not Found"));
+                }
+                //generate otp
+                account.OTP = new Random().Next(100000, 1000000);
+                //add 5 menit untuk otp
+                account.ExpiredTime = DateTime.Now.AddMinutes(5);
+                account.IsUsed = false;
+                _accountRepository.Update(account);
+                //penggunaan email service 
+                _emailHandler.Send("Forgot Password", $"Your OTP is {account.OTP}", forgotPasswordDto.Email);
+                return Ok(new ResponseOkHandler<ForgotPasswordResponseDto>((ForgotPasswordResponseDto)account));
             }
-            var account = _accountRepository.GetByGuid(employee.Guid);
-            if(account == null)
+            catch (Exception ex)
             {
-                return NotFound(new ResponseNotFoundHandler("Account Not Found"));
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseInternalServerErrorHandler("Login Failed", ex.Message));
             }
-            account.OTP = new Random().Next(100000, 1000000);
-            account.ExpiredTime = DateTime.Now.AddMinutes(5);
-            account.IsUsed = false;
-            _accountRepository.Update(account);
-            _emailHandler.Send("Forgot Password", $"Your OTP is {account.OTP}", forgotPasswordDto.Email);
-            return Ok(new ResponseOkHandler<ForgotPasswordResponseDto>((ForgotPasswordResponseDto)account));
+           
         }
 
         [HttpPost("ChangePassword")]
+        [AllowAnonymous]
         public IActionResult ChangePassword(ChangePasswordDto changePasswordDto)
         {
             var employee = _employeeRepository.GetByEmail(changePasswordDto.Email);
@@ -59,6 +81,7 @@ namespace API.Controllers
             {
                 return NotFound(new ResponseNotFoundHandler("Data Not Found"));
             }
+            //mengambil objek axxount by id employee
             var account = _accountRepository.GetByGuid(employee.Guid);
             if (account == null)
             {
@@ -80,6 +103,7 @@ namespace API.Controllers
             { 
                 return BadRequest(new ResponseBadRequestHandler("Password dont Match"));
             }
+            //hash password baru
             account.Password = HashHandler.HashPassword(changePasswordDto.NewPassword);
             account.IsUsed = true;
             _accountRepository.Update(account);
@@ -87,8 +111,10 @@ namespace API.Controllers
         }
 
         [HttpPost("Login")]
+        [AllowAnonymous]
         public IActionResult Login(LoginDto loginDto)
         {
+            //mengambil objek employe by email
             var employee = _employeeRepository.GetByEmail(loginDto.Email);
             if (employee is null)
             {
@@ -104,47 +130,83 @@ namespace API.Controllers
             {
                 return BadRequest(new ResponseBadRequestHandler("Email or Password is invalid"));
             }
-            return Ok(new ResponseOkHandler<string>("Login Success"));
+            var claims = new List<Claim>();
+            claims.Add(new Claim("Email", employee.Email));
+            claims.Add(new Claim("Fullname", string.Concat(employee.FirstName + " " + employee.LastName)));
+
+            var getRoleName = from ar in _accountRoleRepository.GetAll()
+                              join r in _roleRepository.GetAll() on ar.RoleGuid equals r.Guid
+                              where ar.AccountGuid == account.Guid
+                              select r.Name;
+
+            foreach (var roleName in getRoleName) {
+                claims.Add(new Claim(ClaimTypes.Role, roleName));
+            
+            }
+            var token = _tokenHandler.Generate(claims);
+            return Ok(new ResponseOkHandler<Object>("Login Success", new {Token = token}));
         }
 
         [HttpPost("Register")]
+        [AllowAnonymous]
         public IActionResult Register(RegisterDto registerDto)
         {
-            var employee = _employeeRepository.GetByEmail(registerDto.Email);
-            if (employee is null)
-            {
-                employee = registerDto;
-                employee.NIK = GenerateNIKHandler.GenerateNIK(_employeeRepository.GetLastNik());
-                employee = _employeeRepository.Create(employee);
-            }
-            else
-            {
-                return BadRequest(new ResponseBadRequestHandler("Email is Used"));
-            }
+            //mengambil objek employee
+            using var context = _accountRepository.GetContext();
+            using var transaction = context.Database.BeginTransaction();
 
-            var university = _universityRepository.GetUniversityNameByCode(registerDto.UniversityCode);
-            if (university is null)
+            try
             {
-                university = _universityRepository.Create(registerDto);
-            }
 
-            var education = _educationRepository.GetByGuid(employee.Guid);
-            if (education is null)
+                var employee = _employeeRepository.GetByEmail(registerDto.Email);
+                if (employee is null)
+                {
+                    //meng insert apabila tidak ada
+                    employee = registerDto;
+                    employee.NIK = GenerateNIKHandler.GenerateNIK(_employeeRepository.GetLastNik());
+                    employee = _employeeRepository.Create(employee);
+                }
+                else
+                {
+                    //return badrequest apabila ada s
+                    return BadRequest(new ResponseBadRequestHandler("Email is Used"));
+                }
+                //mengambil objek university by code
+                var university = _universityRepository.GetUniversityNameByCode(registerDto.UniversityCode);
+                if (university is null)
+                {
+                    //apabila tidak ada, insert
+                    university = _universityRepository.Create(registerDto);
+                }
+
+                var education = _educationRepository.GetByGuid(employee.Guid);
+                if (education is null)
+                {
+                    Education educationcreate = registerDto;
+                    educationcreate.Guid = employee.Guid;
+                    educationcreate.UniversityGuid = university.Guid;
+                    _educationRepository.Create(educationcreate);
+                }
+                Account account = registerDto;
+                account.Guid = employee.Guid;
+                account.Password = HashHandler.HashPassword(registerDto.Password);
+
+                _accountRepository.Create(account);
+
+                _accountRoleRepository.Create(new AccountRole
+                {
+                    Guid = new Guid(),
+                    AccountGuid = account.Guid,
+                    RoleGuid = _roleRepository.GetRoleGuid() ?? throw new Exception("default row not found")
+                }) ;
+
+                transaction.Commit();
+                return Ok(new ResponseOkHandler<string>("Account Created"));
+            } catch (Exception ex)
             {
-                Education educationcreate = registerDto;
-                educationcreate.Guid = employee.Guid;
-                educationcreate.UniversityGuid = university.Guid;
-                _educationRepository.Create(educationcreate);
+                transaction.Rollback();
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseInternalServerErrorHandler("Failed to create account", ex.Message));
             }
-            Account account = registerDto;
-            account.Guid = employee.Guid;
-            account.Password = HashHandler.HashPassword(registerDto.Password);
-
-            EmployeeDetailsDto responseRegister = (EmployeeDetailsDto)registerDto;
-            responseRegister.Guid = employee.Guid;
-            responseRegister.Nik = employee.NIK;
-            responseRegister.University = university.Name;
-            return Ok(new ResponseOkHandler<EmployeeDetailsDto>(responseRegister));
         }
 
         //method get dari http untuk getall universities

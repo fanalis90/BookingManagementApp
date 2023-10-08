@@ -19,7 +19,7 @@ namespace API.Utilities.Validations.Booking
 
        
             RuleFor(b => b.Status)
-                .NotEmpty()
+                .NotNull()
                 .IsInEnum();
 
             RuleFor(b => b.Remarks)

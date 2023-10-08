@@ -1,6 +1,7 @@
 ﻿using API.Contracts;
 using API.Data;
 using API.Utilities.Handlers.Exceptions;
+using Microsoft.EntityFrameworkCore;
 
 namespace API.Repositories
 {

@@ -7,12 +7,14 @@ using Microsoft.AspNetCore.Mvc;
 using API.Utilities.Handlers;
 using API.Utilities.Handlers.Exceptions;
 using API.DTOs.AccountRoles;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
     //membuat endpoint routing untuk education controller 
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class EducationController : ControllerBase
     {
         //membuat education repository untuk mengakses database sebagai readonly dan private

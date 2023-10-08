@@ -59,6 +59,12 @@ namespace API.Utilities.Validations.Account
                 .NotEmpty()
                 .Must(gpa => gpa >= 0.0f && gpa <= 4.0f);
 
+            RuleFor(r => r.UniversityCode)
+                .NotEmpty();
+
+            RuleFor(r => r.UniversityName)
+                  .NotEmpty();
+
             RuleFor(r => r.Password)
               .NotEmpty()
               .MinimumLength(8)

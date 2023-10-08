@@ -3,6 +3,7 @@ using FluentValidation;
 
 namespace API.Utilities.Validations.Account
 {
+    //membuat validator untuk change password
     public class ChangePasswordValidator : AbstractValidator<ChangePasswordDto>
     {
         public ChangePasswordValidator()

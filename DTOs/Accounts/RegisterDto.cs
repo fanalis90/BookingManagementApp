@@ -58,7 +58,6 @@ namespace API.DTOs.Accounts
         {
             return new University
             {
-                Guid = new Guid(),
                 Code = createUniversityDto.UniversityCode,
                 Name = createUniversityDto.UniversityName,
                 CreatedDate = DateTime.Now,

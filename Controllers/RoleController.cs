@@ -79,9 +79,10 @@ namespace API.Controllers
                     return NotFound(new ResponseNotFoundHandler("Data Not Found"));
 
                 }
-                Role toUpdate = roleDto;
-                toUpdate.CreatedDate = entity.CreatedDate;
-                var result = _roleRepository.Update(roleDto);
+                entity.Name = roleDto.Name;
+                entity.ModifiedDate = DateTime.Now;
+      
+                var result = _roleRepository.Update(entity);
                 return Ok(new ResponseOkHandler<String>("Data Updated"));
 
             }

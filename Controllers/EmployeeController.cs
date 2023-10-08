@@ -10,12 +10,16 @@ using API.DTOs.Accounts;
 using API.DTOs.Rooms;
 using API.Utilities.Handlers.Exceptions;
 using API.DTOs.AccountRoles;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
     //membuat endpoint routing untuk employee controller 
     [ApiController]
     [Route("api/[controller]")]
+    //membuat authorize User
+    [Authorize(Policy ="User")]
     public class EmployeeController : ControllerBase
     {
         //membuat employee repository untuk mengakses database sebagai readonly dan private
@@ -32,6 +36,8 @@ namespace API.Controllers
     
 
         [HttpGet("details")]
+        //membuat authorize manager
+        [Authorize(Policy ="Manager")]
         public IActionResult GetDetails()
         {
             var employee = _employeeRepository.GetAll();
@@ -96,7 +102,7 @@ namespace API.Controllers
                 Employee toCreate = createEmployeeDto;
                 toCreate.NIK = GenerateNIKHandler.GenerateNIK(_employeeRepository.GetLastNik());
                 var result = _employeeRepository.Create(toCreate);
-                return Ok(new ResponseOkHandler<EmployeeDto>((EmployeeDto)result));
+                return Ok(new ResponseOkHandler<EmployeeDto>((EmployeeDto) result));
 
             }
             catch (Exception e)
@@ -117,15 +123,23 @@ namespace API.Controllers
                     return NotFound(new ResponseNotFoundHandler("Data Not Found"));
 
                 }
-                Employee toUpdate = employeeDto;
-                toUpdate.CreatedDate = entity.CreatedDate;
-                var result = _employeeRepository.Update(employeeDto);
+                entity.ModifiedDate = DateTime.Now;
+                entity.Email = employeeDto.Email;
+                entity.BirthDate = employeeDto.BirthDate;
+                entity.HiringDate = employeeDto.HiringDate;
+                entity.FirstName = employeeDto.FirstName;
+                entity.LastName = employeeDto.LastName;
+                entity.Gender = employeeDto.Gender;
+                entity.PhoneNumber = employeeDto.PhoneNumber;
+
+                ///*t/**/oUpdate.NIK = entity.NIK;*/
+                var result = _employeeRepository.Update(entity);
                 return Ok(new ResponseOkHandler<String>("Data Updated"));
 
             }
             catch (Exception e)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseInternalServerErrorHandler("Failed to Create Data", e.Message));
+                return StatusCode(StatusCodes.Status500InternalServerError, new ResponseInternalServerErrorHandler("Failed to Update Data", e.Message));
             }
 
         }

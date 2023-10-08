@@ -12,6 +12,7 @@ namespace API.DTOs.AccountRoles
         //membuat explicit operator untuk response get, create , getbyid
         public static explicit operator AccountRoleDto(AccountRole accountRole) {
             return new AccountRoleDto { 
+                Guid = accountRole.Guid,
                 AccountGuid = accountRole.AccountGuid, 
                 RoleGuid = accountRole.RoleGuid };
         }
