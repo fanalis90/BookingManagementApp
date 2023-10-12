@@ -130,6 +130,7 @@ namespace API.Controllers
             {
                 return BadRequest(new ResponseBadRequestHandler("Email or Password is invalid"));
             }
+            //pembuatan payload untuk jwt tokens
             var claims = new List<Claim>();
             claims.Add(new Claim("Email", employee.Email));
             claims.Add(new Claim("Fullname", string.Concat(employee.FirstName + " " + employee.LastName)));

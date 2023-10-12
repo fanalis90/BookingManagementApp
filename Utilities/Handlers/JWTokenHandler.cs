@@ -13,6 +13,7 @@ namespace API.Utilities.Handlers
         {
             _configuration = configuration;
         }
+        //membutat method untuk generate token jwt 
         public string Generate(IEnumerable<Claim> claims)
         {
             var secretKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWTService:SecretKey"]));

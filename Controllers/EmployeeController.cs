@@ -36,7 +36,7 @@ namespace API.Controllers
     
 
         [HttpGet("details")]
-        //membuat authorize manager
+        //membuat authorize khusus manager
         [Authorize(Policy ="Manager")]
         public IActionResult GetDetails()
         {
